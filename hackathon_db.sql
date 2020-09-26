@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: 127.0.0.1
--- Время создания: Сен 26 2020 г., 15:49
+-- Время создания: Сен 26 2020 г., 20:23
 -- Версия сервера: 10.4.13-MariaDB
 -- Версия PHP: 7.4.8
 
@@ -74,6 +74,24 @@ INSERT INTO `directors` (`login`, `enc_pass`, `name`, `surname`, `id_park`, `tok
 -- --------------------------------------------------------
 
 --
+-- Структура таблицы `genders`
+--
+
+CREATE TABLE `genders` (
+  `id_gender` tinyint(3) UNSIGNED NOT NULL,
+  `gender_name` text NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Дамп данных таблицы `genders`
+--
+
+INSERT INTO `genders` (`id_gender`, `gender_name`) VALUES
+(1, 'male');
+
+-- --------------------------------------------------------
+
+--
 -- Структура таблицы `initiatives`
 --
 
@@ -84,6 +102,24 @@ CREATE TABLE `initiatives` (
   `text` int(11) NOT NULL,
   `date` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
+-- Структура таблицы `marital_states`
+--
+
+CREATE TABLE `marital_states` (
+  `id_m_status` tinyint(3) UNSIGNED NOT NULL,
+  `status_name` text NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Дамп данных таблицы `marital_states`
+--
+
+INSERT INTO `marital_states` (`id_m_status`, `status_name`) VALUES
+(1, 'not maried');
 
 -- --------------------------------------------------------
 
@@ -108,6 +144,15 @@ CREATE TABLE `news` (
   `text` text NOT NULL,
   `date` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Дамп данных таблицы `news`
+--
+
+INSERT INTO `news` (`id_new`, `id_park`, `text`, `date`) VALUES
+(1, 0, 'test1', '2020-09-27 00:59:31'),
+(2, 0, 'test2', '2020-09-27 00:59:40'),
+(3, 0, 'test3', '2020-09-27 00:59:47');
 
 -- --------------------------------------------------------
 
@@ -187,10 +232,17 @@ CREATE TABLE `users` (
   `email` text NOT NULL,
   `enc_pass` text NOT NULL,
   `birth_date` date NOT NULL,
-  `id_m_status` tinyint(4) NOT NULL,
+  `id_m_status` tinyint(4) UNSIGNED NOT NULL,
   `children` tinyint(1) NOT NULL,
-  `id_gender` tinyint(4) NOT NULL
+  `id_gender` tinyint(4) UNSIGNED NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Дамп данных таблицы `users`
+--
+
+INSERT INTO `users` (`id_user`, `name`, `surname`, `email`, `enc_pass`, `birth_date`, `id_m_status`, `children`, `id_gender`) VALUES
+(00000002, 'Danil', 'Senchin', 'se-dan2000@yandex.ru', 'jjj', '2000-09-19', 1, 1, 1);
 
 --
 -- Индексы сохранённых таблиц
@@ -213,11 +265,23 @@ ALTER TABLE `directors`
   ADD KEY `id_park` (`id_park`);
 
 --
+-- Индексы таблицы `genders`
+--
+ALTER TABLE `genders`
+  ADD PRIMARY KEY (`id_gender`);
+
+--
 -- Индексы таблицы `initiatives`
 --
 ALTER TABLE `initiatives`
   ADD PRIMARY KEY (`id_init`),
   ADD KEY `id_park` (`id_park`);
+
+--
+-- Индексы таблицы `marital_states`
+--
+ALTER TABLE `marital_states`
+  ADD PRIMARY KEY (`id_m_status`);
 
 --
 -- Индексы таблицы `models`
@@ -262,7 +326,9 @@ ALTER TABLE `states`
 -- Индексы таблицы `users`
 --
 ALTER TABLE `users`
-  ADD PRIMARY KEY (`id_user`);
+  ADD PRIMARY KEY (`id_user`),
+  ADD KEY `id_m_status` (`id_m_status`),
+  ADD KEY `id_gender` (`id_gender`);
 
 --
 -- AUTO_INCREMENT для сохранённых таблиц
@@ -275,10 +341,22 @@ ALTER TABLE `attractions`
   MODIFY `id_att` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
+-- AUTO_INCREMENT для таблицы `genders`
+--
+ALTER TABLE `genders`
+  MODIFY `id_gender` tinyint(3) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
 -- AUTO_INCREMENT для таблицы `initiatives`
 --
 ALTER TABLE `initiatives`
   MODIFY `id_init` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT для таблицы `marital_states`
+--
+ALTER TABLE `marital_states`
+  MODIFY `id_m_status` tinyint(3) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT для таблицы `models`
@@ -290,7 +368,7 @@ ALTER TABLE `models`
 -- AUTO_INCREMENT для таблицы `news`
 --
 ALTER TABLE `news`
-  MODIFY `id_new` int(11) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id_new` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT для таблицы `offers`
@@ -308,7 +386,7 @@ ALTER TABLE `specials`
 -- AUTO_INCREMENT для таблицы `users`
 --
 ALTER TABLE `users`
-  MODIFY `id_user` int(8) UNSIGNED ZEROFILL NOT NULL AUTO_INCREMENT;
+  MODIFY `id_user` int(8) UNSIGNED ZEROFILL NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- Ограничения внешнего ключа сохраненных таблиц
@@ -351,6 +429,13 @@ ALTER TABLE `offers`
 --
 ALTER TABLE `specials`
   ADD CONSTRAINT `specials_ibfk_1` FOREIGN KEY (`id_att`) REFERENCES `attractions` (`id_att`);
+
+--
+-- Ограничения внешнего ключа таблицы `users`
+--
+ALTER TABLE `users`
+  ADD CONSTRAINT `users_ibfk_1` FOREIGN KEY (`id_m_status`) REFERENCES `marital_states` (`id_m_status`),
+  ADD CONSTRAINT `users_ibfk_2` FOREIGN KEY (`id_gender`) REFERENCES `genders` (`id_gender`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
